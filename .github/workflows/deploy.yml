@@ -54,12 +54,12 @@ jobs:
           source_dir: "build/"
           dest_dir: "${{ github.event.inputs.environment }}/"
 
-      - name: Invalidate CloudFront Cache
-        uses: chetan/invalidate-cloudfront-action@v1.1
-        with:
-          distribution-id: ${{ secrets["CLOUDFRONT_DISTRIBUTION_ID_" + github.event.inputs.environment | toUpperCase()] }}
-          paths: "/*"
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
+      # - name: Invalidate CloudFront Cache
+      #   uses: chetan/invalidate-cloudfront-action@v1.1
+      #   with:
+      #     distribution-id: ${{ secrets["CLOUDFRONT_DISTRIBUTION_ID_" + github.event.inputs.environment | toUpperCase()] }}
+      #     paths: "/*"
+      #   env:
+      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     AWS_REGION: ${{ secrets.AWS_REGION }}
