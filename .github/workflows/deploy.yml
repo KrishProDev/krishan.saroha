@@ -4,63 +4,62 @@ on:
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Select environment (dev/prod/etc)'
+        description: "Select environment (dev/prod/etc)"
         required: true
-        default: 'dev'
+        default: "dev"
         type: choice
         options:
           - dev
           - prod
       branch:
-        description: 'Branch to deploy'
+        description: "Branch to deploy"
         required: true
-        default: 'dev'
+        default: "dev"
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v3
-      with:
-        ref: ${{ github.event.inputs.branch }}
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.inputs.branch }}
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18'  # Or your app's required version
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18" # Or your app's required version
 
-    - name: Install dependencies
-      run: npm install
+      - name: Install dependencies
+        run: npm install
 
-    - name: Build React App
-      run: |
-        if [ "${{ github.event.inputs.environment }}" == "dev" ]; then
-          npm run build:dev  # Ensure this command builds for dev config
-        else
-          npm run build
-        fi
+      - name: Build React App
+        run: |
+          if [ "${{ github.event.inputs.environment }}" == "dev" ]; then
+            npm run build:dev  # Ensure this command builds for dev config
+          else
+            npm run build
+          fi
 
-    - name: Deploy to S3 Bucket
-      uses: jakejarvis/s3-sync-action@v0.6.2
-      with:
-        args: --acl public-read --delete --exact-timestamps
-      env:
-        AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET_NAME }}
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        AWS_REGION: ${{ secrets.AWS_REGION }}
-      with:
-        source_dir: "build/"
-        dest_dir: "${{ github.event.inputs.environment }}/"
+      - name: Deploy to S3 Bucket
+        uses: jakejarvis/s3-sync-action@v0.6.2
+        with:
+          args: --acl public-read --delete --exact-timestamps
+        env:
+          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET_NAME }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          source_dir: "build/"
+          dest_dir: "${{ github.event.inputs.environment }}/"
 
-    - name: Invalidate CloudFront Cache
-      uses: chetan/invalidate-cloudfront-action@v1.1
-      with:
-        distribution-id: ${{ secrets["CLOUDFRONT_DISTRIBUTION_ID_${{ github.event.inputs.environment | toUpperCase }}"] }}
-        paths: '/*'
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        AWS_REGION: ${{ secrets.AWS_REGION }}
+      - name: Invalidate CloudFront Cache
+        uses: chetan/invalidate-cloudfront-action@v1.1
+        with:
+          distribution-id: ${{ secrets["CLOUDFRONT_DISTRIBUTION_ID_" + github.event.inputs.environment | toUpperCase()] }}
+          paths: "/*"
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
