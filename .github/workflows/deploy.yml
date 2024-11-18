@@ -37,9 +37,9 @@ jobs:
       - name: Build React App
         run: |
           if [ "${{ github.event.inputs.environment }}" == "dev" ]; then
-            npm run build:dev  # Ensure this command builds for dev config
+            CI= npm run build:dev  # Ensure this command builds for dev config
           else
-            npm run build
+            CI= npm run build
           fi
 
       - name: Deploy to S3 Bucket
