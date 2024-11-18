@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       environment:
-        description: "Select environment (dev/prod/etc)"
+        description: "Select environment (dev/prod)"
         required: true
         default: "dev"
         type: choice
@@ -14,7 +14,7 @@ on:
       branch:
         description: "Branch to deploy"
         required: true
-        default: "dev"
+        default: "master"
 
 jobs:
   deploy:
@@ -29,7 +29,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "18" # Or your app's required version
+          node-version: "20" # Or your app's required version
 
       - name: Install dependencies
         run: npm install
